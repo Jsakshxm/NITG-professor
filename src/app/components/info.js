@@ -640,7 +640,7 @@ const handleImageUpload = async (file) => {
     </CardTitle>
   </CardHeader>
   <CardContent className="p-4">
-    <textarea
+    <Textarea
       rows={5}
       placeholder="Enter details of trainings, conferences, or short term courses conducted. (e.g., MAY 2017: 10 day Faculty Development Programme...)"
       value={professorData.trainingConducted.join('\n')}
