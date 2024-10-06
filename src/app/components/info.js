@@ -22,21 +22,25 @@ export default function ProfessorForm() {
     branch: '',
     url: '',
     imageUrl: '',
-    dateOfJoining: '',
-    researchTeachingExperience: '',
+
+    research_experience: '',
     address: '',
     email: '',
-    phoneResidence: '',
-    phoneMobile: '',
-    officeExtension: '',
-    researchArea: '',
-    coursesTaughtUG: '',
-    coursesTaughtPG: '',
-    academicInfo: {
-      bachelors: { degree: '', institute: '', year: '', subject: '' },
-      masters: { degree: '', institute: '', year: '', subject: '' },
-      phd: { degree: '', institute: '', year: '', subject: '' }
-    },
+    phone_residence: '',
+    phone_mobile: '',
+    office_extension: '',
+    research_area: '',
+    ug_courses: [],
+  pg_courses: [],
+    degree_ug: '',                     // Added individual field for UG degree
+    institute_university_ug: '',       // Added individual field for UG institute/university
+    year_ug: '',                       // Added individual field for UG year of graduation
+    degree_pg: '',                     // Added individual field for PG degree
+    institute_university_pg: '',       // Added individual field for PG institute/university
+    year_pg: '',                       // Added individual field for PG year of graduation
+    degree_phd: '',                    // Added individual field for Ph.D. degree
+    institute_university_phd: '',      // Added individual field for Ph.D. institute/university
+    year_phd: '',                      // Added individual field for Ph.D. year of graduation
     paperpublished: [],
     researchguidance: [],
     awardandhonor: [],
@@ -44,8 +48,18 @@ export default function ProfessorForm() {
     professionalservices: [],
     fundedresearchproject: [],
     trainingattended: [],
-    trainingConducted: []
+    trainingConducted: [],
+    journal_publications_international: [],  // Field for Journal Publications (International)
+    journal_publications_national: [],       // Field for Journal Publications (National)
+    conference_publications_international: [],  // Field for Conference Publications (International)
+    conference_publications_national: [],    // Field for Conference Publications (National)
+    book_chapters: [],                       // Field for Book Chapters
+    books_authored: [],                      // Field for Books Authored
+    patents: []                              // Field for Patents
   });
+  
+  
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 const dispatch = useDispatch();
@@ -105,7 +119,7 @@ dispatch(addinfo(data));
 
  const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) {
       console.error('Error fetching user:', error);
@@ -120,11 +134,16 @@ dispatch(addinfo(data));
 
       if (saveError) {
         console.error('Error saving professor data:', saveError);
+        setLoading(false);
       } else {
+setLoading(false);
         console.log('Professor data saved successfully');
-        router.push('/dashboard'); // Redirect after saving
+        router.push('/dashboard'); 
       }
     }
+    if(professorData.name === '' && professorData.designation === '' && professorData.department === ''){
+      alert('Please make sure name, designation and department are filled');}
+      setLoading(false);
   };
 
   const handleArrayChange = (field, newValue) => {
@@ -167,14 +186,14 @@ const handleImageUpload = async (file) => {
 };
 
 
-  
+ 
 
   
   
   return (
 <Card className="max-w-4xl m-4 mx-auto border border-gray-300 rounded-lg shadow-lg">
   <CardHeader className="p-4 text-white bg-blue-500 rounded-t-lg">
-    <CardTitle className="text-2xl font-semibold">Professor Information Form</CardTitle>
+    <CardTitle className="text-2xl font-semibold">User Information Form</CardTitle>
   </CardHeader>
   <CardContent className="p-6 space-y-6">
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -309,17 +328,17 @@ const handleImageUpload = async (file) => {
       value={professorData.researchguidance?.join('\n')}
       onChange={(e) => {
         const newGuidance = e.target.value.split('\n');
-        setProfessorData({ ...professorData, researchguidance: newguidance });
+        setProfessorData({ ...professorData, researchguidance: newGuidance });
       }}
       className="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
-    <Button
+    {/* <Button
       type="button"
       onClick={() => handleArrayChange('researchGuidance', 'New Guidance Entry')}
       className="w-full mt-4 text-white bg-blue-500 hover:bg-blue-600"
     >
       Add Guidance
-    </Button>
+    </Button> */}
   </CardContent>
 </Card>
 
@@ -327,183 +346,173 @@ const handleImageUpload = async (file) => {
  {/* Academic Information */}
  <div className="space-y-4">
     {/* UG Course Details */}
-    <Card>
-      <CardHeader>
-        <CardTitle>Undergraduate Course Details</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="degree_ug">Degree (UG)</Label>
-          <Input
-            id="degree_ug"
-            placeholder="Enter your UG degree"
-            value={professorData.degree_ug}
-            onChange={(e) => setProfessorData({ ...professorData, degree_ug: e.target.value })}
-          />
-        </div>
-        <div>
-          <Label htmlFor="institute_university_ug">Institute/University (UG)</Label>
-          <Input
-            id="institute_university_ug"
-            placeholder="Enter your UG institute/university"
-            value={professorData.institute_university_ug}
-            onChange={(e) => setProfessorData({ ...professorData, institute_university_ug: e.target.value })}
-          />
-        </div>
-        <div>
-          <Label htmlFor="year_ug">Year of Graduation (UG)</Label>
-          <Input
-            id="year_ug"
-            placeholder="Enter your UG graduation year"
-            value={professorData.year_ug}
-            onChange={(e) => setProfessorData({ ...professorData, year_ug: e.target.value })}
-          />
-        </div>
-      </CardContent>
-    </Card>
-
-    {/* PG Course Details */}
-    <Card>
-      <CardHeader>
-        <CardTitle>Postgraduate Course Details</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="degree_pg">Degree (PG)</Label>
-          <Input
-            id="degree_pg"
-            placeholder="Enter your PG degree"
-            value={professorData.degree_pg}
-            onChange={(e) => setProfessorData({ ...professorData, degree_pg: e.target.value })}
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="year_pg">Year of Graduation (PG)</Label>
-          <Input
-            id="year_pg"
-            placeholder="Enter your PG graduation year"
-            value={professorData.year_pg}
-            onChange={(e) => setProfessorData({ ...professorData, year_pg: e.target.value })}
-          />
-        </div>
-      </CardContent>
-    </Card>
-
     <Card className="mb-4">
-      <CardHeader>
-        <CardTitle>PhD</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Input
-          type="text"
-          placeholder="Degree (PhD)"
-          value={professorData.degree_phd}
-          onChange={(e) => handleAcademicChange('degree_phd', e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg"
-        />
-        <Input
-          type="text"
-          placeholder="Institute (PhD)"
-          value={professorData.institute_university_phd}
-          onChange={(e) => handleAcademicChange('institute_university_phd', e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg"
-        />
-        <Input
-          type="text"
-          placeholder="Year (PhD)"
-          value={professorData.year_phd}
-          onChange={(e) => handleAcademicChange('year_phd', e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg"
-        />
-      </CardContent>
-    </Card>
+  <CardHeader>
+    <CardTitle>Academic Details (UG)</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    <div>
+      <Label htmlFor="degree_ug">Degree (UG)</Label>
+      <Input
+        id="degree_ug"
+        placeholder="Enter your UG degree"
+        value={professorData.degree_ug}
+        onChange={(e) => setProfessorData({ ...professorData, degree_ug: e.target.value })}
+      />
+    </div>
+    <div>
+      <Label htmlFor="institute_university_ug">Institute/University (UG)</Label>
+      <Input
+        id="institute_university_ug"
+        placeholder="Enter your UG institute/university"
+        value={professorData.institute_university_ug}
+        onChange={(e) => setProfessorData({ ...professorData, institute_university_ug: e.target.value })}
+      />
+    </div>
+    <div>
+      <Label htmlFor="year_ug">Year of Graduation (UG)</Label>
+      <Input
+        id="year_ug"
+        placeholder="Enter your UG graduation year"
+        value={professorData.year_ug}
+        onChange={(e) => setProfessorData({ ...professorData, year_ug: e.target.value })}
+      />
+    </div>
+  </CardContent>
+</Card>
+
+{/* PG Course Details */}
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Academic Details (PG)</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    <div>
+      <Label htmlFor="degree_pg">Degree (PG)</Label>
+      <Input
+        id="degree_pg"
+        placeholder="Enter your PG degree"
+        value={professorData.degree_pg}
+        onChange={(e) => setProfessorData({ ...professorData, degree_pg: e.target.value })}
+      />
+    </div>
+    <div>
+      <Label htmlFor="institute_university_pg">Institute/University (PG)</Label>
+      <Input
+        id="institute_university_pg"
+        placeholder="Enter your PG institute/university"
+        value={professorData.institute_university_pg}
+        onChange={(e) => setProfessorData({ ...professorData, institute_university_pg: e.target.value })}
+      />
+    </div>
+    <div>
+      <Label htmlFor="year_pg">Year of Graduation (PG)</Label>
+      <Input
+        id="year_pg"
+        placeholder="Enter your PG graduation year"
+        value={professorData.year_pg}
+        onChange={(e) => setProfessorData({ ...professorData, year_pg: e.target.value })}
+      />
+    </div>
+  </CardContent>
+</Card>
+
+{/* PhD Details */}
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Academic Details (PhD)</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    <div>
+      <Label htmlFor="degree_phd">Degree (PhD)</Label>
+      <Input
+        id="degree_phd"
+        placeholder="Enter your PhD degree"
+        value={professorData.degree_phd}
+        onChange={(e) => setProfessorData({ ...professorData, degree_phd: e.target.value })}
+      />
+    </div>
+    <div>
+      <Label htmlFor="institute_university_phd">Institute/University (PhD)</Label>
+      <Input
+        id="institute_university_phd"
+        placeholder="Enter your PhD institute/university"
+        value={professorData.institute_university_phd}
+        onChange={(e) => setProfessorData({ ...professorData, institute_university_phd: e.target.value })}
+      />
+    </div>
+    <div>
+      <Label htmlFor="year_phd">Year of Graduation (PhD)</Label>
+      <Input
+        id="year_phd"
+        placeholder="Enter your PhD graduation year"
+        value={professorData.year_phd}
+        onChange={(e) => setProfessorData({ ...professorData, year_phd: e.target.value })}
+      />
+    </div>
+  </CardContent>
+</Card>
+
 
     {/* Academic Information */}
     {/* UG Courses */}
     <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>UG Courses Taught</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {professorData.ug_courses?.map((item, index) => (
-            <Input
-              key={index}
-              type="text"
-              placeholder={`UG Course ${index + 1}`}
-              value={item}
-              onChange={(e) => {
-                const newCourses = [...professorData.ug_courses];
-                newCourses[index] = e.target.value;
-                setProfessorData({ ...professorData, ug_courses: newCourses });
-              }}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-          ))}
-          <Button
-            type="button"
-            onClick={() => handleArrayChange('ug_courses', '')}
-            className="w-full text-white bg-blue-500 hover:bg-blue-600"
-          >
-            Add UG Course
-          </Button>
-        </CardContent>
-      </Card>
+  <CardHeader>
+    <CardTitle>UG Courses Taught</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData?.ug_courses?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newCourses = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, ug_courses: newCourses });
+      }}
+      placeholder="Enter UG courses, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.ug_courses?.length || 1}
+    />
+  </CardContent>
+</Card>
+
 
       {/* PG Courses */}
-      <Card>
-        <CardHeader>
-          <CardTitle>PG Courses Taught</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {professorData.pg_courses?.map((item, index) => (
-            <Input
-              key={index}
-              type="text"
-              placeholder={`PG Course ${index + 1}`}
-              value={item}
-              onChange={(e) => {
-                const newCourses = [...professorData.pg_courses];
-                newCourses[index] = e.target.value;
-                setProfessorData({ ...professorData, pg_courses: newCourses });
-              }}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-          ))}
-          <Button
-            type="button"
-            onClick={() => handleArrayChange('pg_courses', '')}
-            className="w-full text-white bg-blue-500 hover:bg-blue-600"
-          >
-            Add PG Course
-          </Button>
-        </CardContent>
-      </Card>
+      <Card className="mb-4">
+  <CardHeader>
+    <CardTitle>PG Courses Taught</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.pg_courses?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newCourses = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, pg_courses: newCourses });
+      }}
+      placeholder="Enter PG courses, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.pg_courses?.length || 1}
+    />
+  </CardContent>
+</Card>
+
 
       <Card className="mb-4">
-    <CardHeader>
-      <CardTitle>Award and Honor</CardTitle>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      {professorData.awardandhonor?.map((item, index) => (
-        <Input
-          key={index}
-          type="text"
-          placeholder={`Award ${index + 1}`}
-          value={item}
-          onChange={(e) => onChange('awardandhonor', index, e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg"
-        />
-      ))}
-      <Button
-        type="button"
-        onClick={() => onAdd('awardandhonor')}
-        className="mt-2"
-      >
-        Add Award
-      </Button>
-    </CardContent>
-  </Card>
+  <CardHeader>
+    <CardTitle>Awards and Honors</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.awardandhonor?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newAwards = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, awardandhonor: newAwards });
+      }}
+      placeholder="Enter awards and honors, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.awardandhonor?.length || 1}
+    />
+  </CardContent>
+</Card>
+
   {/* Paper Published */}
 {/* Paper Published */}
 <Card className="mb-4">
@@ -523,35 +532,155 @@ const handleImageUpload = async (file) => {
     />
   </CardContent>
 </Card>
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Journal Publications (International)</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.journal_publications_international?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newPublications = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, journal_publications_international: newPublications });
+      }}
+      placeholder="Enter publications, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.journal_publications_international?.length || 1}
+    />
+  </CardContent>
+</Card>
+
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Journal Publications (National)</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.journal_publications_national?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newPublications = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, journal_publications_national: newPublications });
+      }}
+      placeholder="Enter publications, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.journal_publications_national?.length || 1}
+    />
+  </CardContent>
+</Card>
+
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Conference Publications (International)</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.conference_publications_international?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newPublications = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, conference_publications_international: newPublications });
+      }}
+      placeholder="Enter publications, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.conference_publications_international?.length || 1}
+    />
+  </CardContent>
+</Card>
+
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Conference Publications (National)</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.conference_publications_national?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newPublications = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, conference_publications_national: newPublications });
+      }}
+      placeholder="Enter publications, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.conference_publications_national?.length || 1}
+    />
+  </CardContent>
+</Card>
+
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Book Chapters</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.book_chapters?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newChapters = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, book_chapters: newChapters });
+      }}
+      placeholder="Enter book chapters, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.book_chapters?.length || 1}
+    />
+  </CardContent>
+</Card>
+
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Books Authored</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.books_authored?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newBooks = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, books_authored: newBooks });
+      }}
+      placeholder="Enter books authored, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.books_authored?.length || 1}
+    />
+  </CardContent>
+</Card>
+
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Patents</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.patents?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newPatents = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, patents: newPatents });
+      }}
+      placeholder="Enter patents, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.patents?.length || 1}
+    />
+  </CardContent>
+</Card>
 
 
 
 
 
-  <Card className="mb-4">
-    <CardHeader>
-      <CardTitle>Membership and Professional Society</CardTitle>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      {professorData.membership?.map((item, index) => (
-        <Input
-          key={index}
-          type="text"
-          placeholder={`Membership ${index + 1}`}
-          value={item}
-          onChange={(e) => onChange('membership', index, e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg"
-        />
-      ))}
-      <Button
-        type="button"
-        onClick={() => onAdd('membership')}
-        className="mt-2"
-      >
-        Add Membership
-      </Button>
-    </CardContent>
-  </Card>
+
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Membership and Professional Society</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.membership?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newMemberships = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, membership: newMemberships });
+      }}
+      placeholder="Enter memberships, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.membership?.length || 1}
+    />
+  </CardContent>
+</Card>
+
 
   <Card className="mb-4 border border-gray-200 rounded-lg shadow-md">
   <CardHeader className="px-4 py-2 border-b border-gray-200 rounded-t-lg bg-gray-50">
@@ -570,39 +699,27 @@ const handleImageUpload = async (file) => {
       }}
       className="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
-    <Button
-      type="button"
-      className="w-full mt-4 text-white bg-blue-500 hover:bg-blue-600"
-    >
-      Add Professional Service
-    </Button>
+   
+  </CardContent>
+</Card>
+<Card className="mb-4">
+  <CardHeader>
+    <CardTitle>Funded Research Project</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Textarea
+      value={professorData.fundedresearchproject?.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+      onChange={(e) => {
+        const newProjects = e.target.value.split('\n').map((line) => line.replace(/^\d+\.\s*/, ''));
+        setProfessorData({ ...professorData, fundedresearchproject: newProjects });
+      }}
+      placeholder="Enter projects, one per line"
+      className="w-full p-2 border border-gray-300 rounded-lg"
+      rows={professorData.fundedresearchproject?.length || 1}
+    />
   </CardContent>
 </Card>
 
-  <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Funded Research Project</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {professorData.fundedresearchproject?.map((item, index) => (
-            <Input
-              key={index}
-              type="text"
-              placeholder={`Project ${index + 1}`}
-              value={item}
-              onChange={(e) => handleFieldChange('fundedresearchproject', index, e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg"
-            />
-          ))}
-          <Button
-            type="button"
-            onClick={() => handleAddField('fundedresearchproject')}
-            className="mt-2"
-          >
-            Add Project
-          </Button>
-        </CardContent>
-      </Card>
       <div>
       {/* Training/Conferences/Short Term Courses Attended */}
       <Card className="mb-4 border border-gray-200 rounded-lg shadow-md">
@@ -622,13 +739,7 @@ const handleImageUpload = async (file) => {
       }}
       className="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
-    <Button
-      type="button"
-      onClick={() => handleAddField('trainingattended')}
-      className="w-full mt-4 text-white bg-blue-500 hover:bg-blue-600"
-    >
-      Add Training Attended
-    </Button>
+    
   </CardContent>
 </Card>
 
@@ -650,12 +761,7 @@ const handleImageUpload = async (file) => {
       }}
       className="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
-    <Button
-      type="button"
-      className="w-full mt-4 "
-    >
-      Add Training Conducted
-    </Button>
+   
   </CardContent>
 </Card>
 
